@@ -18,6 +18,7 @@ import torch
 
 try:
     import wandb
+    from wandb.vendor.pynvml import pynvml
 except ModuleNotFoundError:
     pass
 
@@ -147,6 +148,28 @@ def training_log(
             ),
             neox_args.use_wandb,
         )
+
+    # Alert low GPU memory allocation.
+    if torch.distributed.get_rank() == 0:
+        do_alert_low_gpu_mem_alloc = False
+
+        gpu_device_count = pynvml.nvmlDeviceGetCount()
+        for gpu_index in range(gpu_device_count):
+            handle = pynvml.nvmlDeviceGetHandleByIndex(gpu_index)
+            memory_info = pynvml.nvmlDeviceGetMemoryInfo(handle)
+            gpu_mem_alloc = memory_info.used / memory_info.total
+            if gpu_mem_alloc < 0.5:
+                do_alert_low_gpu_mem_alloc = True
+                break
+
+        if do_alert_low_gpu_mem_alloc:
+            tb_wandb_alert(
+                "Low GPU memory allocation!",
+                "Low GPU memory allocation! | iteration {:8d}/{:8d}".format(
+                    iteration, neox_args.train_iters
+                ),
+                neox_args.use_wandb,
+            )
 
     total_loss_dict[got_nan_key] = total_loss_dict.get(got_nan_key, 0) + int(got_nan)
 
