@@ -138,6 +138,16 @@ def training_log(
             is_nan = value == float("inf") or value == -float("inf") or value != value
             got_nan = got_nan or is_nan
 
+    # Alert NaN.
+    if got_nan:
+        tb_wandb_alert(
+            "Got NaN!",
+            "Got NaN! | iteration {:8d}/{:8d}".format(
+                iteration, neox_args.train_iters
+            ),
+            neox_args.use_wandb,
+        )
+
     total_loss_dict[got_nan_key] = total_loss_dict.get(got_nan_key, 0) + int(got_nan)
 
     # Logging.
@@ -386,3 +396,14 @@ def tb_wandb_log(
             tensorboard_writer.add_scalar(key, value, iteration_no)
         if use_wandb:
             wandb.log({key: value}, step=iteration_no)
+
+
+def tb_wandb_alert(
+    title: str,
+    text: str,
+    use_wandb: bool,
+):
+    # alerts to wandb (if present) from the zeroth rank
+    do_alert = torch.distributed.get_rank() == 0
+    if do_alert and use_wandb:
+        wandb.alert(title=title, text=text)
