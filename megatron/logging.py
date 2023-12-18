@@ -164,8 +164,8 @@ def training_log(
     if do_alert_low_gpu_mem_alloc:
         tb_wandb_alert(
             "Low GPU memory allocation!",
-            "Low GPU memory allocation! | iteration {:8d}/{:8d}".format(
-                iteration, neox_args.train_iters
+            "Low GPU memory allocation! | iteration {:8d}/{:8d} | rank {:d}".format(
+                iteration, neox_args.train_iters, torch.distributed.get_rank()
             ),
             neox_args.use_wandb,
             True,
