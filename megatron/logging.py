@@ -425,8 +425,9 @@ def tb_wandb_alert(
     title: str,
     text: str,
     use_wandb: bool,
+    all_ranks: bool = False,
 ):
     # alerts to wandb (if present) from the zeroth rank
-    do_alert = torch.distributed.get_rank() == 0
+    do_alert = torch.distributed.get_rank() == 0 or all_ranks
     if do_alert and use_wandb:
         wandb.alert(title=title, text=text)
