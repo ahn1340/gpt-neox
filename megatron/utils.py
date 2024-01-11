@@ -27,6 +27,7 @@ import requests
 
 try:
     import wandb
+    from wandb.vendor.pynvml import pynvml
 except ModuleNotFoundError:
     pass
 
@@ -171,6 +172,8 @@ def init_wandb(neox_args):
                 force=False,
                 entity=neox_args.wandb_team,
             )
+            # Initialize pynvml.
+            pynvml.nvmlInit()
         except wandb.UsageError as e:
             neox_args.update_value("use_wandb", False)
             print(e)
