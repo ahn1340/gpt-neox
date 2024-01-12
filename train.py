@@ -18,12 +18,14 @@
 """Train"""
 from megatron.neox_arguments import NeoXArgs
 from megatron.training import pretrain
+from wandb.vendor.pynvml import pynvml
 
 def main(input_args=None, overwrite_values=None):
     neox_args = NeoXArgs.consume_neox_args(input_args=input_args, overwrite_values=overwrite_values)
     neox_args.configure_distributed_args()
     neox_args.build_tokenizer()  # tokenizer needs to be build in training in order to set the padding vocab
     neox_args.initialize_tensorboard_writer()  # is initialized if tensorboard directory is defined
+    pynvml.nvmlInit()
     pretrain(neox_args=neox_args)
 
 if __name__ == "__main__":

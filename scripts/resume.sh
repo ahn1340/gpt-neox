@@ -3,11 +3,11 @@
 #SBATCH --requeue
 #SBATCH --job-name="train"
 #SBATCH --partition=a40x
-#SBATCH --time=7-00:00:00
+#SBATCH --time=2:00:00
 #SBATCH --nodes=16
 #SBATCH --gres=gpu:8
 #SBATCH --ntasks-per-node=8         
-#SBATCH --cpus-per-task=10
+#SBATCH --cpus-per-task=12
 #SBATCH --output=/admin/home-jinwooahn/repos/exp/logs/train.out  # 본인 경로에 맞게 수정
 #SBATCH --error=/admin/home-jinwooahn/repos/exp/logs/train.err  # 본인 경로에 맞게 수정
 #SBATCH --account=oslo
@@ -62,4 +62,5 @@ NUM_NODES=16
 NUM_GPUS_PER_NODE=8
 export SLURM_NTASKS=$(($NUM_NODES*$NUM_GPUS_PER_NODE))
 
-python ./deepy.py train.py -d configs polyglot-v2/6-9B.yml polyglot-v2/train-polyglot.yml
+python ./deepy.py train.py -d configs polyglot-v2/6-9B.yml polyglot-v2/train-s3-multi-resume.yml
+

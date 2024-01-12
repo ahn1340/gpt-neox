@@ -61,14 +61,36 @@ def make_builder(out_file, impl, vocab_size=None):
 
 
 def make_dataset(path, impl, skip_warmup=False):
-    # Added for polyglot v2. Code is supoptimal but this should do for now..
-    if impl == 's3': # TODO: check if object key in specified bucket exists
+    # Added for polyglot v2. Hardcoded for now
+    if impl == 's3':
         print_rank_0("Using S3 Dataset")
-        # Ideally, these should be passed as NeoX arguments
-        s3_object = 'mmap/small_exp_50B.bin'
+
+        # parse s3 object and bucket
         s3_bucket = 'polyglot-korean-west'
-        #local_path = '/admin/home-ingyu/repos/data/small_text_document'
-        return S3IndexedDataset(s3_bucket, s3_object, path, skip_warmup)
+        refined_prefix = 'ko/merged_raw/mmap_preprocess/refined-bin-datas/'
+        korean_prefix = 'ko/merged_raw/mmap_preprocess/ko-bin-merge-exact-datas/'
+        stack_slim_prefix = 'ko/merged_raw/mmap_preprocess/bin-datas/'
+        test_prefix = 'mmap'
+        # map local idx files to bin files in S3
+        if 'merge' in path:
+            # korean
+            s3_bin = os.path.join(korean_prefix, path.split('/')[-1] + '.bin')
+        elif 'refined' in path:
+            # refinedweb
+            s3_bin = os.path.join(refined_prefix, path.split('/')[-1] + '.bin')
+        elif 'stack' in path or 'slim' in path:
+            # the stack, slim
+            s3_bin = os.path.join(stack_slim_prefix, path.split('/')[-1] + '.bin')
+        elif 'small_exp' in path:
+            s3_bin = os.path.join(test_prefix, path.split('/')[-1] + '.bin')
+        else:
+            raise ValueError("Unknown dataset")
+
+        print_rank_0("#"*100)
+        print_rank_0(s3_bin)
+        print_rank_0("#"*100)
+
+        return S3IndexedDataset(s3_bucket, s3_bin, path, skip_warmup)
 
     if not IndexedDataset.exists(path):
         print(f"Dataset does not exist: {path}")
@@ -679,23 +701,23 @@ class S3IndexedDataset(torch.utils.data.Dataset):
                 offset = stream.tell()
 
             if not skip_warmup:
-                print("    warming up index mmap file...")
+                print_rank_0("    warming up index mmap file...")
                 _warmup_mmap_file(path)
 
             self._bin_buffer_mmap = np.memmap(path, mode="r", order="C")
             self._bin_buffer = memoryview(self._bin_buffer_mmap)
-            print("    reading sizes...")
+            print_rank_0("    reading sizes...")
             self._sizes = np.frombuffer(
                 self._bin_buffer, dtype=np.int32, count=self._len, offset=offset
             )
-            print("    reading pointers...")
+            print_rank_0("    reading pointers...")
             self._pointers = np.frombuffer(
                 self._bin_buffer,
                 dtype=np.int64,
                 count=self._len,
                 offset=offset + self._sizes.nbytes,
             )
-            print("    reading document index...")
+            print_rank_0("    reading document index...")
             self._doc_idx = np.frombuffer(
                 self._bin_buffer,
                 dtype=np.int64,

@@ -1,6 +1,6 @@
 {
    "pipe_parallel_size": 1,
-   "model_parallel_size": 2,
+   "model_parallel_size": 4,
 
    "num_layers": 32,
    "hidden_size": 4096,
@@ -9,8 +9,8 @@
    "max_position_embeddings": 2048,
    "norm": "layernorm",
    "pos_emb": "rotary",
-   "no_weight_tying": true,
    "rotary_pct": 0.25,
+   "no_weight_tying": true,
    "gpt_j_residual": true,
    "output_layer_parallelism": "column",
 
@@ -18,7 +18,6 @@
 
    "scaled_upper_triang_masked_softmax_fusion": true,
    "bias_gelu_fusion": true,
-
 
    "optimizer": {
      "type": "Adam",
@@ -28,7 +27,6 @@
        "eps": 1.0e-8
      }
    },
-
    "min_lr": 0.000012,
 
    "zero_optimization": {
@@ -42,9 +40,9 @@
     "cpu_offload": false
   },
 
-   "train_micro_batch_size_per_gpu": 16,
-   "gradient_accumulation_steps": 16,
-   "data_impl": "mmap",
+   "train_batch_size": 1024,
+   "train_micro_batch_size_per_gpu": 4,
+   "gradient_accumulation_steps": 8,
 
    "checkpoint_activations": false,
    "checkpoint_num_layers": 1,
@@ -56,24 +54,30 @@
    "hidden_dropout": 0,
    "attention_dropout": 0,
 
-   "fp16": {
-     "fp16": true,
-     "enabled": true,
-     "loss_scale": 0,
-     "loss_scale_window": 1000,
-     "initial_scale_power": 12,
-     "hysteresis": 2,
-     "min_loss_scale": 1
-   },
+   # bf16
+   "precision": "bfloat16",
+   "fp32_allreduce": True, # without a patch to torch, bf16 models have to do the allreduce in fp32
+   "data_types": {"grad_accum_dtype": "fp32"},
 
-   "train_iters": 5,
-   "lr_decay_iters": 100,
+   #"fp16": {
+   #  "fp16": true,
+   #  "enabled": true,
+   #  "loss_scale": 0,
+   #  "loss_scale_window": 1000,
+   #  "initial_scale_power": 12,
+   #  "hysteresis": 2,
+   #  "min_loss_scale": 1
+   #},
+
+   "train_iters": 715000,
+   "lr_decay_iters": 715000,
+   "keep_last_n_checkpoints": 1,
    "distributed_backend": "nccl",
    "lr_decay_style": "cosine",
    "warmup": 0.01,
-   "checkpoint_factor": 5,
-   "eval_interval": 5,
-   "eval_iters": 2,
+   "checkpoint_factor": 5000,
+   "eval_interval": 5000,
+   "eval_iters": 100,
 
    "log_interval": 1,
    "steps_per_print": 1,

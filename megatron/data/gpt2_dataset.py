@@ -139,6 +139,16 @@ def _build_index_mappings(
     # Number of tokens in each epoch and number of required epochs.
     tokens_per_epoch = _num_tokens(documents, sizes)
     num_epochs = _num_epochs(tokens_per_epoch, seq_length, num_samples)
+    # added by Jinu
+    samples_per_epoch = tokens_per_epoch // seq_length
+    num_epochs_precise = num_samples / samples_per_epoch
+    print_rank_0("*"*100)
+    print_rank_0(f'{tokens_per_epoch=}')
+    print_rank_0(f'{seq_length=}')
+    print_rank_0(f'{num_samples=}')
+    print_rank_0(f'{name} {data_prefix} num_epochs: {num_epochs_precise}')
+    print_rank_0("*"*100)
+
     # rng state
     np_rng = np.random.RandomState(seed=seed)
 
