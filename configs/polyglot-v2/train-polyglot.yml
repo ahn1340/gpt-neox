@@ -84,7 +84,7 @@
   "data_impl": "s3",
   "vocab_file": "/weka/home-jinwooahn/tokenizer/polyglot_bpe_50k.json",
   "save": "/weka/home-jinwooahn/polyglot-v2/checkpoints",  # if this is not set, checkpoint does not save at all
-  "s3_path": "s3://polyglot-korean-west/polyglot-v2/checkpoints",
+  "s3_path": "s3://polyglot-korean-west/polyglot-v2",
   "checkpoint_validation_with_forward_pass": false,
   "tensorboard_dir": "tensorboard",
   "log_dir": "logs",

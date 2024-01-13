@@ -3,7 +3,7 @@
 #SBATCH --requeue
 #SBATCH --job-name="train"
 #SBATCH --partition=a40x
-#SBATCH --time=2:00:00
+#SBATCH --time=7-00:00:00
 #SBATCH --nodes=16
 #SBATCH --gres=gpu:8
 #SBATCH --ntasks-per-node=8         
@@ -23,6 +23,9 @@ ds_report
 # load cuda version 11.8 to use with fused_kernel
 module load openmpi
 module load cuda/11.8
+
+# For Jinu (본인에게 맞게 변경)
+export AWS_CONFIG_FILE=/admin/home-jinwooahn/repos/.aws/config
 
 # NCCL stuff
 export NCCL_DEBUG=WARNING
@@ -62,5 +65,4 @@ NUM_NODES=16
 NUM_GPUS_PER_NODE=8
 export SLURM_NTASKS=$(($NUM_NODES*$NUM_GPUS_PER_NODE))
 
-python ./deepy.py train.py -d configs polyglot-v2/6-9B.yml polyglot-v2/train-s3-multi-resume.yml
-
+python ./deepy.py train.py -d configs polyglot-v2/6-9B.yml polyglot-v2/resume-polyglot.yml

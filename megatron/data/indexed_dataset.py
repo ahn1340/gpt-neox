@@ -63,7 +63,7 @@ def make_builder(out_file, impl, vocab_size=None):
 def make_dataset(path, impl, skip_warmup=False):
     # Added for polyglot v2. Hardcoded for now
     if impl == 's3':
-        print_rank_0("Using S3 Dataset")
+        print_rank_0(f"Using S3 Dataset with idx file at {path}")
 
         # parse s3 object and bucket
         s3_bucket = 'polyglot-korean-west'
@@ -81,7 +81,7 @@ def make_dataset(path, impl, skip_warmup=False):
         elif 'stack' in path or 'slim' in path:
             # the stack, slim
             s3_bin = os.path.join(stack_slim_prefix, path.split('/')[-1] + '.bin')
-        elif 'small_exp' in path:
+        elif 'small' in path:
             s3_bin = os.path.join(test_prefix, path.split('/')[-1] + '.bin')
         else:
             raise ValueError("Unknown dataset")

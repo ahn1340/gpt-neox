@@ -3,12 +3,10 @@
                        "/admin/home-jinwooahn/repos/data/indexes/mmap/small_exp_50B"],
   "valid_data_paths": ["/admin/home-jinwooahn/repos/data/indexes/mmap/small_text_document"],
   "test_data_paths": ["/admin/home-jinwooahn/repos/data/indexes/mmap/small_text_document"],
-  "weight_by_num_documents": true,
-  "weighted_sampler_alpha": 1.0,
   "data_impl": "s3",
   "vocab_file": "/weka/home-jinwooahn/tokenizer/polyglot_bpe_50k.json",
-  "save": "/weka/home-jinwooahn/checkpoints/small-scale-12B",  # if this is not set, checkpoint does not save at all
-  "s3_path": "s3://polyglot-korean-west/checkpoints/",
+  "save": "/weka/home-jinwooahn/small-scale-12B/checkpoints",  # if this is not set, checkpoint does not save at all
+  "s3_path": "s3://polyglot-korean-west/small-scale-12B",
   "checkpoint_validation_with_forward_pass": false,
   "tensorboard_dir": "tensorboard",
   "log_dir": "logs",

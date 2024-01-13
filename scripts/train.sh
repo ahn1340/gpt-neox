@@ -24,6 +24,9 @@ ds_report
 module load openmpi
 module load cuda/11.8
 
+# For Jinu (본인에게 맞게 변경)
+export AWS_CONFIG_FILE=/admin/home-jinwooahn/repos/.aws/config
+
 # NCCL stuff
 export NCCL_DEBUG=WARNING
 export NCCL_TREE_THRESHOLD=0
